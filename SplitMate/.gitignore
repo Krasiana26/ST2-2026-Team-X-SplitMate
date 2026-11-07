@@ -18,3 +18,5 @@
 **/App_Data/*.db
 **/App_Data/*.db-shm
 **/App_Data/*.db-wal
+**/bin/
+**/obj/
