@@ -1,0 +1,92 @@
+
+@model List<SplitMate.Models.Balance>
+
+@{
+    ViewData["Title"] = "Split Expenses";
+    var groupName = ViewBag.GroupName as string ?? "";
+    var members = ViewBag.Members as string ?? "";
+}
+
+<div class="container mt-4">
+    <h1>Split Expenses</h1>
+    <p class="text-muted">
+        Calculate how much each group member owes.
+    </p>
+
+    <div class="card p-4 mb-4">
+        <form asp-controller="Splitting"
+              asp-action="Index" method="get">
+
+            <div class="mb-3">
+                <label class="form-label">Group Name</label>
+                <input type="text" name="groupName"
+                       value="@groupName"
+                       class="form-control"
+                       placeholder="e.g. friends" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Group Members (comma separated)
+                </label>
+                <input type="text" name="members"
+                       value="@members"
+                       class="form-control"
+                       placeholder="Ivan, Maria, Peter" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Calculate Balances
+            </button>
+        </form>
+    </div>
+
+    <div asp-validation-summary="All"
+         class="text-danger"></div>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="card p-4">
+            <h3>Group Balances</h3>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Total Paid</th>
+                        <th>Fair Share</th>
+                        <th>Net Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var balance in Model)
+                    {
+                        <tr>
+                            <td>@balance.PersonName</td>
+                            <td>@balance.TotalPaid.ToString("F2")</td>
+                            <td>@balance.TotalOwed.ToString("F2")</td>
+                            <td>
+                                @if (balance.NetBalance > 0)
+                                {
+                                    <span class="text-success">
+                                        +@balance.NetBalance.ToString("F2")
+                                    </span>
+                                }
+                                else if (balance.NetBalance < 0)
+                                {
+                                    <span class="text-danger">
+                                        @balance.NetBalance.ToString("F2")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>0.00</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
