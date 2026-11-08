@@ -49,6 +49,67 @@ namespace SplitMate.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var expense = _database.GetById(id);
+
+            if (expense == null)
+            {
+                return NotFound();
+            }
+
+            return View(expense);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Expense expense)
+        {
+            if (_database.GetById(id) == null)
+            {
+                return NotFound();
+            }
+
+            expense.Id = id;
+
+            if (!ModelState.IsValid)
+            {
+                return View(expense);
+            }
+
+            if (!_database.Update(expense))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var expense = _database.GetById(id);
+
+            if (expense == null)
+            {
+                return NotFound();
+            }
+
+            return View(expense);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            if (!_database.Delete(id))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
-

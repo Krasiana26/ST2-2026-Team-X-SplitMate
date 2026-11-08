@@ -124,6 +124,7 @@
                                 <th>Paid By</th>
                                 <th>Date</th>
                                 <th>Amount</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
 
@@ -140,6 +141,20 @@
                                     </td>
                                     <td>
                                         @expense.Amount.ToString("F2")
+                                    </td>
+                                    <td>
+                                        <a asp-controller="Expenses"
+                                           asp-action="Edit"
+                                           asp-route-id="@expense.Id"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+                                        <a asp-controller="Expenses"
+                                           asp-action="Delete"
+                                           asp-route-id="@expense.Id"
+                                           class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </a>
                                     </td>
                                 </tr>
                             }
