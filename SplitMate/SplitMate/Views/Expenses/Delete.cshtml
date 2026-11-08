@@ -1,0 +1,46 @@
+@model SplitMate.Models.Expense
+
+@{
+    ViewData["Title"] = "Delete Expense";
+}
+
+<div class="container mt-4">
+    <h1>Delete Expense</h1>
+    <div class="alert alert-warning">
+        Are you sure you want to delete this expense?
+    </div>
+
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Title</dt>
+                <dd class="col-sm-9">@Model.Title</dd>
+                <dt class="col-sm-3">Amount</dt>
+                <dd class="col-sm-9">@Model.Amount.ToString("F2")</dd>
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">@Model.Category</dd>
+                <dt class="col-sm-3">Group</dt>
+                <dd class="col-sm-9">@Model.GroupName</dd>
+                <dt class="col-sm-3">Paid By</dt>
+                <dd class="col-sm-9">@Model.PaidBy</dd>
+                <dt class="col-sm-3">Date</dt>
+                <dd class="col-sm-9">@Model.ExpenseDate.ToString("dd/MM/yyyy")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <form asp-controller="Expenses"
+          asp-action="DeleteConfirmed"
+          asp-route-id="@Model.Id"
+          method="post">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-danger">
+            Confirm Delete
+        </button>
+        <a asp-controller="Expenses"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+    </form>
+</div>
