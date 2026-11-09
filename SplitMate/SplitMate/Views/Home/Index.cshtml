@@ -1,8 +1,108 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SplitMate.Models.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Dashboard</h2>
+            <p class="text-muted mb-0">Welcome to SplitMate</p>
+        </div>
+
+        <a asp-controller="Expenses"
+           asp-action="Create"
+           class="btn btn-dark px-4">
+            + Add Expense
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <p class="text-muted mb-2">Total Expenses</p>
+                <h2 class="fw-bold mb-0">
+                    @Model.TotalExpenses.ToString("N2") €
+                </h2>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <p class="text-muted mb-2">Total Transactions</p>
+                <h2 class="fw-bold mb-0">
+                    @Model.ExpenseCount
+                </h2>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Expenses</h5>
+
+                <a asp-controller="Expenses"
+                   asp-action="Index"
+                   class="text-decoration-none text-dark">
+                    View All →
+                </a>
+            </div>
+
+            @if (Model.RecentExpenses.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr class="text-muted">
+                                <th>Title</th>
+                                <th>Category</th>
+                                <th>Paid By</th>
+                                <th>Group</th>
+                                <th>Date</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var expense in Model.RecentExpenses)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@expense.Title</td>
+                                    <td>@expense.Category</td>
+                                    <td>@expense.PaidBy</td>
+                                    <td>@expense.GroupName</td>
+                                    <td>@expense.ExpenseDate.ToString("dd.MM.yyyy")</td>
+                                    <td class="text-end fw-semibold">
+                                        @expense.Amount.ToString("N2") €
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h6 class="fw-semibold">No expenses yet</h6>
+                    <p class="text-muted mb-3">
+                        Start by adding your first expense.
+                    </p>
+                    <a asp-controller="Expenses"
+                       asp-action="Create"
+                       class="btn btn-dark">
+                        Add your first expense
+                    </a>
+                </div>
+            }
+
+        </div>
+    </div>
+
 </div>
