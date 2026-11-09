@@ -1,0 +1,85 @@
+@model SplitMate.Models.AiAssistantViewModel
+
+@{
+    ViewData["Title"] = "AI Assistant";
+}
+
+<section class="ai-assistant">
+    <div class="ai-assistant-heading">
+        <div>
+            <span class="ai-eyebrow">SPLITMATE INTELLIGENCE</span>
+            <h1>AI Financial Assistant</h1>
+            <p>Get help understanding your finances, all in one place.</p>
+        </div>
+        <span class="ai-status">
+            <span class="ai-status-dot"></span>
+            @(Model.IsConfigured ? "Ready" : "Not connected")
+        </span>
+    </div>
+
+    <div class="ai-chat-panel">
+        <div class="ai-chat-header">
+            <div class="ai-avatar" aria-hidden="true">✦</div>
+            <div>
+                <h2>Financial Assistant</h2>
+                <span>AI responses powered by OpenRouter</span>
+            </div>
+        </div>
+
+        <div class="ai-chat-content">
+            @if (!Model.IsConfigured)
+            {
+                <div class="ai-configuration-notice" role="status">
+                    <span class="ai-notice-icon" aria-hidden="true">i</span>
+                    <div>
+                        <strong>AI service not configured</strong>
+                        <p>
+                            Add the OpenRouter API key and model to the
+                            server-side configuration to start chatting.
+                        </p>
+                    </div>
+                </div>
+            }
+
+            <div id="ai-messages" class="ai-messages"
+                 role="log" aria-live="polite" aria-relevant="additions text"></div>
+            <div class="ai-welcome">
+                <div class="ai-welcome-icon" aria-hidden="true">✦</div>
+                <h3>Your financial sidekick</h3>
+                <p>
+                    Ask about your recorded spending and get practical
+                    answers grounded in your expense summaries.
+                </p>
+            </div>
+        </div>
+
+        <form id="ai-chat-form" class="ai-composer"
+              asp-controller="AiAssistant" asp-action="Send"
+              method="post" aria-label="Chat with AI assistant">
+            @Html.AntiForgeryToken()
+            <textarea id="ai-message" name="message" class="form-control"
+                      rows="1"
+                      maxlength="2000"
+                      placeholder="Ask a question about your expenses..."
+                      aria-label="Message"
+                      disabled="@(!Model.IsConfigured)"
+                      required></textarea>
+            <button id="ai-send-button" type="submit"
+                    class="ai-send-button"
+                    disabled="@(!Model.IsConfigured)"
+                    aria-label="Send message">
+                <span aria-hidden="true">↑</span>
+            </button>
+        </form>
+        <p id="ai-disclaimer" class="ai-disclaimer">
+            Your message and a summary of all expenses in this shared
+            SplitMate instance (total and category totals only) will be sent
+            to OpenRouter. Individual transactions, titles, and payer names
+            are not shared.
+        </p>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/ai-assistant.js" asp-append-version="true"></script>
+}
