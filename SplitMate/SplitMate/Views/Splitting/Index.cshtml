@@ -5,88 +5,146 @@
     ViewData["Title"] = "Split Expenses";
     var groupName = ViewBag.GroupName as string ?? "";
     var members = ViewBag.Members as string ?? "";
+    var balances = Model ?? new List<SplitMate.Models.Balance>();
 }
 
-<div class="container mt-4">
-    <h1>Split Expenses</h1>
-    <p class="text-muted">
-        Calculate how much each group member owes.
-    </p>
+<div class="container mt-4 split-page">
+    <header class="split-page-header">
+        <span class="split-eyebrow">SHARED SPENDING</span>
+        <h1>Split Expenses</h1>
+        <p class="text-muted">Calculate how much each group member owes.</p>
+    </header>
 
-    <div class="card p-4 mb-4">
-        <form asp-controller="Splitting"
-              asp-action="Index" method="get">
-
-            <div class="mb-3">
-                <label class="form-label">Group Name</label>
-                <input type="text" name="groupName"
-                       value="@groupName"
-                       class="form-control"
-                       placeholder="e.g. friends" required />
+    <section class="card split-form-card" aria-labelledby="split-form-title">
+        <div class="card-body">
+            <div class="split-form-heading">
+                <span class="split-form-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M4 7h15m0 0-4-4m4 4-4 4M20 17H5m0 0 4 4m-4-4 4-4" /></svg>
+                </span>
+                <div>
+                    <h2 id="split-form-title">Set up a group split</h2>
+                    <p class="text-muted mb-0">Choose a group and list everyone sharing the expenses.</p>
+                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">
-                    Group Members (comma separated)
-                </label>
-                <input type="text" name="members"
-                       value="@members"
-                       class="form-control"
-                       placeholder="Ivan, Maria, Peter" required />
-            </div>
+            <form asp-controller="Splitting" asp-action="Index" method="get">
+                <div class="row g-3">
+                    <div class="col-12 col-md-5">
+                        <label class="form-label" for="split-group-name">Group name</label>
+                        <input id="split-group-name" type="text" name="groupName"
+                               value="@groupName" class="form-control"
+                               placeholder="e.g. Weekend trip" required />
+                    </div>
+                    <div class="col-12 col-md-7">
+                        <label class="form-label" for="split-members">Group members</label>
+                        <input id="split-members" type="text" name="members"
+                               value="@members" class="form-control"
+                               placeholder="Alex Morgan, Sam Lee, Jordan Kim" required />
+                    </div>
+                </div>
 
-            <button type="submit" class="btn btn-primary">
-                Calculate Balances
-            </button>
-        </form>
-    </div>
+                <div class="split-form-footer">
+                    <span class="split-form-hint">Separate member names with commas.</span>
+                    <button type="submit" class="btn btn-primary split-calculate-button">
+                        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M3 6h13m0 0-3-3m3 3-3 3M17 14H4m0 0 3 3m-3-3 3-3" /></svg>
+                        Calculate balances
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
 
-    <div asp-validation-summary="All"
-         class="text-danger"></div>
+    <div asp-validation-summary="All" class="split-validation-summary" role="alert"></div>
 
-    @if (Model != null && Model.Count > 0)
+    @if (balances.Count > 0)
     {
-        <div class="card p-4">
-            <h3>Group Balances</h3>
+        <section class="split-results" aria-labelledby="split-results-title">
+            <div class="split-results-heading">
+                <div>
+                    <span class="split-eyebrow">RESULTS</span>
+                    <h2 id="split-results-title">Group balances</h2>
+                </div>
+                <span class="split-member-count">@balances.Count @(balances.Count == 1 ? "member" : "members")</span>
+            </div>
 
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Member</th>
-                        <th>Total Paid</th>
-                        <th>Fair Share</th>
-                        <th>Net Balance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var balance in Model)
-                    {
-                        <tr>
-                            <td>@balance.PersonName</td>
-                            <td>@balance.TotalPaid.ToString("F2")</td>
-                            <td>@balance.TotalOwed.ToString("F2")</td>
-                            <td>
+            <div class="split-balance-grid">
+                @foreach (var balance in balances)
+                {
+                    var nameParts = (balance.PersonName ?? string.Empty).Trim()
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    var initials = nameParts.Length == 0
+                        ? "?"
+                        : nameParts.Length == 1
+                            ? nameParts[0][..Math.Min(2, nameParts[0].Length)].ToUpperInvariant()
+                            : string.Concat(nameParts[0][0], nameParts[^1][0]).ToUpperInvariant();
+                    var balanceState = balance.NetBalance > 0
+                        ? "positive"
+                        : balance.NetBalance < 0 ? "negative" : "zero";
+                    var balanceLabel = balance.NetBalance > 0
+                        ? "Group owes member"
+                        : balance.NetBalance < 0 ? "Member owes group" : "Settled";
+
+                    <article class="split-balance-card split-balance-card-@balanceState">
+                        <div class="split-member-heading">
+                            <span class="split-member-avatar" aria-hidden="true">@initials</span>
+                            <h3>@balance.PersonName</h3>
+                        </div>
+
+                        <div class="split-balance-metrics">
+                            <div>
+                                <span>Total paid</span>
+                                <strong>@balance.TotalPaid.ToString("F2")</strong>
+                            </div>
+                            <div>
+                                <span>Fair share</span>
+                                <strong>@balance.TotalOwed.ToString("F2")</strong>
+                            </div>
+                        </div>
+
+                        <div class="split-net-balance split-net-balance-@balanceState">
+                            <span class="split-balance-status">
                                 @if (balance.NetBalance > 0)
                                 {
-                                    <span class="text-success">
-                                        +@balance.NetBalance.ToString("F2")
-                                    </span>
+                                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 13V3m0 0L4 7m4-4 4 4" /></svg>
                                 }
                                 else if (balance.NetBalance < 0)
                                 {
-                                    <span class="text-danger">
-                                        @balance.NetBalance.ToString("F2")
-                                    </span>
+                                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 3v10m0 0 4-4m-4 4-4-4" /></svg>
                                 }
                                 else
                                 {
-                                    <span>0.00</span>
+                                    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M3 6h10M3 10h10" /></svg>
                                 }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                @balanceLabel
+                            </span>
+                            <strong>
+                                @if (balance.NetBalance > 0)
+                                {
+                                    @:+@balance.NetBalance.ToString("F2")
+                                }
+                                else
+                                {
+                                    @balance.NetBalance.ToString("F2")
+                                }
+                            </strong>
+                        </div>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="split-empty-state" aria-labelledby="split-empty-title">
+            <svg viewBox="0 0 88 88" aria-hidden="true" focusable="false">
+                <circle cx="44" cy="44" r="35" fill="#f3eadc" />
+                <circle cx="33" cy="35" r="8" fill="#d8b98b" />
+                <circle cx="56" cy="35" r="8" fill="#d8b98b" />
+                <path d="M19 62c1-10 7-15 14-15s13 5 14 15m-4 0c1-8 6-12 13-12s12 4 13 12" fill="none" stroke="#8d704b" stroke-linecap="round" stroke-width="3" />
+                <path d="M39 44h10" stroke="#8d704b" stroke-linecap="round" stroke-width="3" />
+            </svg>
+            <h2 id="split-empty-title">Your group split starts here</h2>
+            <p class="text-muted mb-0">Enter a group name and its members above to see each person's totals and balance.</p>
+        </section>
     }
 </div>

@@ -1,4 +1,8 @@
 ﻿
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,26 +29,30 @@
             <div class="sidebar-section">
                 <span class="sidebar-label">MENU</span>
 
-                <a class="sidebar-link active"
-                   asp-controller="Home" asp-action="Index">
+                                <a class="sidebar-link @(currentController == "Home" && currentAction == "Index" ? "active" : "")"
+                                     aria-current="@(currentController == "Home" && currentAction == "Index" ? "page" : null)"
+                                     asp-controller="Home" asp-action="Index">
                     <span class="menu-icon">⌂</span>
                     Dashboard
                 </a>
 
-                <a class="sidebar-link"
-                   asp-controller="Expenses" asp-action="Index">
+                                <a class="sidebar-link @(currentController == "Expenses" ? "active" : "")"
+                                     aria-current="@(currentController == "Expenses" ? "page" : null)"
+                                     asp-controller="Expenses" asp-action="Index">
                     <span class="menu-icon">↗</span>
                     Expenses
                 </a>
 
-                <a class="sidebar-link"
-                   asp-controller="Splitting" asp-action="Index">
+                                <a class="sidebar-link @(currentController == "Splitting" ? "active" : "")"
+                                     aria-current="@(currentController == "Splitting" ? "page" : null)"
+                                     asp-controller="Splitting" asp-action="Index">
                     <span class="menu-icon">⇄</span>
                     Split Expenses
                 </a>
 
-                <a class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "AiAssistant" ? "active" : "")"
-                   asp-controller="AiAssistant" asp-action="Index">
+                                <a class="sidebar-link @(currentController == "AiAssistant" ? "active" : "")"
+                                     aria-current="@(currentController == "AiAssistant" ? "page" : null)"
+                                     asp-controller="AiAssistant" asp-action="Index">
                     <span class="menu-icon">✦</span>
                     AI Assistant
                 </a>
@@ -53,8 +61,9 @@
             <div class="sidebar-bottom">
                 <div class="sidebar-divider"></div>
 
-                <a class="sidebar-link"
-                   asp-controller="Home" asp-action="Privacy">
+                                <a class="sidebar-link @(currentController == "Home" && currentAction == "Privacy" ? "active" : "")"
+                                     aria-current="@(currentController == "Home" && currentAction == "Privacy" ? "page" : null)"
+                                     asp-controller="Home" asp-action="Privacy">
                     <span class="menu-icon">⚙</span>
                     Settings
                 </a>
