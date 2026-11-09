@@ -42,6 +42,12 @@
                     <span class="menu-icon">⇄</span>
                     Split Expenses
                 </a>
+
+                <a class="sidebar-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "AiAssistant" ? "active" : "")"
+                   asp-controller="AiAssistant" asp-action="Index">
+                    <span class="menu-icon">✦</span>
+                    AI Assistant
+                </a>
             </div>
 
             <div class="sidebar-bottom">

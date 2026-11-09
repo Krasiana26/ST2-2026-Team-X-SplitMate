@@ -1,9 +1,11 @@
 
 using SplitMate.Data;
+using SplitMate.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<IAiAssistantService, OpenRouterAiAssistantService>();
 
 var dbFolder = Path.Combine(builder.Environment.ContentRootPath, "App_Data");
 Directory.CreateDirectory(dbFolder);
