@@ -188,7 +188,7 @@ public class ExpenseEditDeleteControllerTests
         ExpenseDate = new DateTime(2026, 11, 8)
     };
 
-    private sealed class TestDatabase : IDatabase
+    private sealed class TestDatabase : IExpenseRepository
     {
         private readonly Dictionary<int, Expense> _expenses;
 
