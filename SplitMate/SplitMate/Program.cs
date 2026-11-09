@@ -14,6 +14,8 @@ var connectionString = $"Data Source={dbPath}";
 builder.Services.AddSingleton<IDatabase>(
     _ => Database.Initialize(connectionString));
 
+builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

@@ -2,25 +2,26 @@
 using Microsoft.AspNetCore.Mvc;
 using SplitMate.Data;
 using SplitMate.Models;
+using SplitMate.Services;
 
 namespace SplitMate.Controllers
 {
     public class ExpensesController : Controller
     {
-        private readonly IDatabase _database;
+        private readonly IExpenseRepository _repository;
 
-        public ExpensesController(IDatabase database)
+        public ExpensesController(IExpenseRepository repository)
         {
-            _database = database;
+            _repository = repository;
         }
 
-        // Показване и филтриране на разходите
+        // Display and filter expenses
         public IActionResult Index(
             string? searchTerm,
             string? category,
             string? groupName)
         {
-            var expenses = _database.GetAll(
+            var expenses = _repository.GetAll(
                 searchTerm,
                 category,
                 groupName);
@@ -28,14 +29,14 @@ namespace SplitMate.Controllers
             return View(expenses);
         }
 
-        // Отваряне на формата за нов разход
+        // Open the form for a new expense
         [HttpGet]
         public IActionResult Create()
         {
             return View(new Expense());
         }
 
-        // Записване на нов разход
+        // Save a new expense using Factory Pattern
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Expense expense)
@@ -45,7 +46,15 @@ namespace SplitMate.Controllers
                 return View(expense);
             }
 
-            _database.Add(expense);
+            var newExpense = ExpenseFactory.Create(
+                expense.Title,
+                expense.Amount,
+                expense.Category,
+                expense.PaidBy,
+                expense.GroupName,
+                expense.ExpenseDate);
+
+            _repository.Add(newExpense);
 
             return RedirectToAction(nameof(Index));
         }
@@ -53,7 +62,7 @@ namespace SplitMate.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var expense = _database.GetById(id);
+            var expense = _repository.GetById(id);
 
             if (expense == null)
             {
@@ -67,7 +76,7 @@ namespace SplitMate.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, Expense expense)
         {
-            if (_database.GetById(id) == null)
+            if (_repository.GetById(id) == null)
             {
                 return NotFound();
             }
@@ -79,7 +88,7 @@ namespace SplitMate.Controllers
                 return View(expense);
             }
 
-            if (!_database.Update(expense))
+            if (!_repository.Update(expense))
             {
                 return NotFound();
             }
@@ -90,7 +99,7 @@ namespace SplitMate.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            var expense = _database.GetById(id);
+            var expense = _repository.GetById(id);
 
             if (expense == null)
             {
@@ -104,7 +113,7 @@ namespace SplitMate.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            if (!_database.Delete(id))
+            if (!_repository.Delete(id))
             {
                 return NotFound();
             }
